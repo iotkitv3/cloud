@@ -24,10 +24,21 @@ Azure IoT Hub unterstützt folgende Protokolle:
 * MQTT
 * MQTT über WebSockets
 
+
+**Einrichten eines Azure IoT Hub-Kontos**
+
+Befolgen Sie die offizielle Dokumentation von Azure IoT Hub zu
+
+* Erstellen Sie einen neuen Hub im Azure-Portal ([Dokumentation](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal#create-an-iot-hub)). Für dieses Beispiel benötigen Sie einen Standard- Tier- Hub, um Cloud-to-Device-Nachrichten zu aktivieren. Dazu reicht die kostenlose Variante (Free Tier).
+* Registrieren Sie ein neues Gerät bei dem von Ihnen erstellten Hub ([Dokumentation](https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-create-through-portal#register-a-new-device-in-the-iot-hub)). Kopieren Sie den "Primary Connection String" des Geräts und übertragen diesen in `mbed_app.json` ins Feld `value` von `iothub_connection_string`.
+
+Jetzt kann der IoT Hub mit diesem [Beispiel](main.cpp) verwendet werden.
+
 Das [mbed Beispiel](main.cpp) verbindet sich via dem MQTT Protokoll mit der Azure Cloud.
 
 **Links**
 * [Mbed OS example for Azure IoT Hub](https://github.com/ARMmbed/mbed-os-example-for-azure)
+* [Azure C SDK](https://github.com/Azure/azure-iot-sdk-c)
 
 
 ## AWS IoT
