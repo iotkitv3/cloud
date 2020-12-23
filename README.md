@@ -3,6 +3,8 @@ Cloud IoT Services
 
 Cloud Anbindung an Amazon (AWS), Google und Microsoft (Azure)
 
+**ACHTUNG**: es werden nur das [DISCO-L475VG-IOT01A](https://github.com/iotkitv4/intro/tree/main/hw#disco-l475vg-iot01a) und das Original [NXP K64F Board](https://os.mbed.com/platforms/FRDM-K64F/) via Ethernet Kabel, unterstützt.
+
 ## Azure IoT
 ***
 
@@ -22,8 +24,9 @@ Azure IoT Hub unterstützt folgende Protokolle:
 * MQTT
 * MQTT über WebSockets
 
-Das mbed Beispiel verbindet sich via dem MQTT Protokoll mit der Azure Cloud.
+Das [mbed Beispiel](main.cpp) verbindet sich via dem MQTT Protokoll mit der Azure Cloud.
 
+**Links**
 * [Mbed OS example for Azure IoT Hub](https://github.com/ARMmbed/mbed-os-example-for-azure)
 
 
@@ -51,6 +54,10 @@ Das mbed Beispiel verbindet sich via dem MQTT Protokoll mit der AWS Cloud.
 
 * [Mbed OS example for AWS IoT SDK](https://github.com/ARMmbed/mbed-os-example-for-aws)
 
+## Weitere Cloud Beispiele
+
+* [Mbed OS example for Google IoT Cloud](https://github.com/ARMmbed/mbed-os-example-for-google-iot-cloud)
+* [Pelion Device Management](https://github.com/ARMmbed/mbed-os-example-pelion)
 
 
 
