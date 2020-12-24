@@ -3,7 +3,7 @@ Cloud IoT Services
 
 Cloud Anbindung an Amazon (AWS), Google und Microsoft (Azure)
 
-**ACHTUNG**: es werden nur das [DISCO-L475VG-IOT01A](https://github.com/iotkitv4/intro/tree/main/hw#disco-l475vg-iot01a) und das Original [NXP K64F Board](https://os.mbed.com/platforms/FRDM-K64F/) via Ethernet Kabel, unterstützt.
+**ACHTUNG**: es werden nur das [DISCO-L475VG-IOT01A](https://github.com/iotkitv3/intro/tree/main/hw#disco-l475vg-iot01a) und das Original [NXP K64F Board](https://os.mbed.com/platforms/FRDM-K64F/) via Ethernet Kabel, unterstützt.
 
 ## Azure IoT
 ***
