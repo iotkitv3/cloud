@@ -36,9 +36,20 @@ Jetzt kann der IoT Hub mit diesem [Beispiel](main.cpp) verwendet werden.
 
 Das [mbed Beispiel](main.cpp) verbindet sich via dem MQTT Protokoll mit der Azure Cloud.
 
+**Anzeigen der Meldungen**
+
+Dazu muss zuerst das Azure CLI installiert werden.
+
+Anschliessend sich einloggen, `azure-iot` Extension installieren und Events ausgeben
+
+    az login
+    az extension add --name azure-iot
+    az iot hub monitor-events --hub-name <IoT Hub Name> --props all
+
 **Links**
 * [Mbed OS example for Azure IoT Hub](https://github.com/ARMmbed/mbed-os-example-for-azure)
 * [Azure C SDK](https://github.com/Azure/azure-iot-sdk-c)
+* [How to test Messages arriving in Azure IoTHub](https://stackoverflow.com/questions/35381303/how-to-test-messages-arriving-in-azure-iothub)
 
 
 ## AWS IoT

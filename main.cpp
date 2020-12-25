@@ -136,6 +136,22 @@ void demo() {
             goto cleanup;
         }
 
+        const char* MSG_ID = "iotkit";
+        const char* MSG_CORRELATION_ID = "sensors";
+        const char* MSG_PROP_KEYS[2] = { "temp", "hum" };
+        const char* MSG_PROP_VALS[2] = { "23.0", "40.0" };
+
+        // Sent system properties on the message
+        (void)IoTHubMessage_SetMessageId(message_handle, MSG_ID);
+        (void)IoTHubMessage_SetCorrelationId(message_handle, MSG_CORRELATION_ID);
+
+        // Set the custom properties on the message
+        MAP_HANDLE mapHandle = IoTHubMessage_Properties(message_handle);
+        for (size_t index = 0; index < 2; index++)
+        {
+            (void)Map_AddOrUpdate(mapHandle, MSG_PROP_KEYS[index], MSG_PROP_VALS[index]);
+        }        
+
         res = IoTHubDeviceClient_SendEventAsync(client_handle, message_handle, on_message_sent, nullptr);
         IoTHubMessage_Destroy(message_handle); // message already copied into the SDK
 
