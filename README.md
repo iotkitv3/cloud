@@ -3,8 +3,6 @@ Cloud IoT Services
 
 Cloud Anbindung an Amazon (AWS), Google und Microsoft (Azure)
 
-**ACHTUNG**: es werden nur das [DISCO-L475VG-IOT01A](https://github.com/iotkitv3/intro/tree/main/hw#disco-l475vg-iot01a) und das Original [NXP K64F Board](https://os.mbed.com/platforms/FRDM-K64F/) via Ethernet Kabel, unterstützt.
-
 ## Azure IoT
 ***
 
@@ -24,6 +22,12 @@ Azure IoT Hub unterstützt folgende Protokolle:
 * MQTT
 * MQTT über WebSockets
 
+Das Azure IoT Beispiel wurde mit folgenden Boards getestet:
+* [DISCO-L475VG-IOT01A](https://github.com/iotkitv3/intro/tree/main/hw#disco-l475vg-iot01a)
+* [IoTKitV3 K64F Board](https://github.com/iotkitv3/iotkit#iotkitv3-k64f)
+* [NXP K64F Original Board](https://os.mbed.com/platforms/FRDM-K64F/) via Ethernet Kabel
+
+Das [NUCLEO-F303RE Board](https://github.com/iotkitv3/iotkit#nucleo-f303re) funktioniert nicht, wegen fehlender Unterstützung für TLS.
 
 **Einrichten eines Azure IoT Hub-Kontos**
 
@@ -75,6 +79,8 @@ Mit AWS IoT Core für LoRaWAN können Sie drahtlose LoRaWAN-Geräte (Low-Power-W
 Das mbed Beispiel verbindet sich via dem MQTT Protokoll mit der AWS Cloud.
 
 * [Mbed OS example for AWS IoT SDK](https://github.com/ARMmbed/mbed-os-example-for-aws)
+* [AWS IoT Core](https://aws.amazon.com/de/iot-core/)
+* [AWS SDK für C++](https://aws.amazon.com/de/sdk-for-cpp/)
 
 ## Weitere Cloud Beispiele
 
