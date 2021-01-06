@@ -19,6 +19,29 @@
 
 #include "iothubtransportmqtt.h"
 
+#if MBED_CONF_IOTKIT_HTS221_SENSOR == true
+#include "HTS221Sensor.h"
+#endif
+#if MBED_CONF_IOTKIT_BMP180_SENSOR == true
+#include "BMP180Wrapper.h"
+#endif
+#include "OLEDDisplay.h"
+#include "Servo.h"
+
+// UI
+OLEDDisplay oled( MBED_CONF_IOTKIT_OLED_RST, MBED_CONF_IOTKIT_OLED_SDA, MBED_CONF_IOTKIT_OLED_SCL );
+
+static DevI2C devI2c( MBED_CONF_IOTKIT_I2C_SDA, MBED_CONF_IOTKIT_I2C_SCL );
+#if MBED_CONF_IOTKIT_HTS221_SENSOR == true
+static HTS221Sensor hum_temp(&devI2c);
+#endif
+#if MBED_CONF_IOTKIT_BMP180_SENSOR == true
+static BMP180Wrapper hum_temp( &devI2c );
+#endif
+
+// Servo2 (Pin mit PWM)
+Servo servo2 ( MBED_CONF_IOTKIT_SERVO2 );
+
 /**
  * This example sends and receives messages to and from Azure IoT Hub.
  * The API usages are based on Azure SDK's official iothub_convenience_sample.
@@ -51,6 +74,11 @@ static IOTHUBMESSAGE_DISPOSITION_RESULT on_message_received(IOTHUB_MESSAGE_HANDL
 
     message_received = true;
     LogInfo("Message body: %.*s", len, data_ptr);
+
+    float value;
+    if  ( sscanf( (char*) data_ptr, "servo2=%f", &value ) == 1 )
+        servo2 = value;
+
     return IOTHUBMESSAGE_ACCEPTED;
 }
 
@@ -64,7 +92,10 @@ static void on_message_sent(IOTHUB_CLIENT_CONFIRMATION_RESULT result, void* user
     }
 }
 
-void demo() {
+void loop() 
+{
+    uint8_t id;
+    float temp, hum;
     static const char connection_string[] = MBED_CONF_APP_IOTHUB_CONNECTION_STRING;
     bool trace_on = MBED_CONF_APP_IOTHUB_CLIENT_TRACE;
     tickcounter_ms_t interval = 100;
@@ -121,13 +152,19 @@ void demo() {
     // or until we receive a message from the cloud
     IOTHUB_MESSAGE_HANDLE message_handle;
     char message[80];
-    for (int i = 0; i < 10; ++i) {
-        if (message_received) {
-            // If we have received a message from the cloud, don't send more messeges
+    for (int i = 0; i < 10; ++i) 
+    {
+        if (message_received) 
+        {
+            // If we have received a message from the cloud, don't send more messages
             break;
         }
 
-        sprintf(message, "%d messages left to send, or until we receive a reply", 10 - i);
+        // Temperator Sensor lesen und als PayLoad aufbereiten
+        hum_temp.read_id(&id);
+        hum_temp.get_temperature(&temp);
+        hum_temp.get_humidity(&hum); 
+        sprintf( message, "{ \"message\": %d, \"sensorid\": 0x%X, \"temp\": %2.2f, \"hum\": %2.1f }", i, id, temp, hum );
         LogInfo("Sending: \"%s\"", message);
 
         message_handle = IoTHubMessage_CreateFromString(message);
@@ -138,19 +175,19 @@ void demo() {
 
         const char* MSG_ID = "iotkit";
         const char* MSG_CORRELATION_ID = "sensors";
-        const char* MSG_PROP_KEYS[2] = { "temp", "hum" };
-        const char* MSG_PROP_VALS[2] = { "23.0", "40.0" };
+        //const char* MSG_PROP_KEYS[2] = { "temp", "hum" };
+        //const char* MSG_PROP_VALS[2] = { "23.0", "40.0" };
 
         // Sent system properties on the message
         (void)IoTHubMessage_SetMessageId(message_handle, MSG_ID);
         (void)IoTHubMessage_SetCorrelationId(message_handle, MSG_CORRELATION_ID);
 
         // Set the custom properties on the message
-        MAP_HANDLE mapHandle = IoTHubMessage_Properties(message_handle);
-        for (size_t index = 0; index < 2; index++)
-        {
-            (void)Map_AddOrUpdate(mapHandle, MSG_PROP_KEYS[index], MSG_PROP_VALS[index]);
-        }        
+        //MAP_HANDLE mapHandle = IoTHubMessage_Properties(message_handle);
+        //for (size_t index = 0; index < 2; index++)
+        //{
+        //    (void)Map_AddOrUpdate(mapHandle, MSG_PROP_KEYS[index], MSG_PROP_VALS[index]);
+        //}        
 
         res = IoTHubDeviceClient_SendEventAsync(client_handle, message_handle, on_message_sent, nullptr);
         IoTHubMessage_Destroy(message_handle); // message already copied into the SDK
@@ -176,7 +213,8 @@ cleanup:
     IoTHub_Deinit();
 }
 
-int main() {
+int main() 
+{
     LogInfo("Connecting to the network");
 
     _defaultSystemNetwork = NetworkInterface::get_default_instance();
@@ -208,9 +246,24 @@ int main() {
     time_t rtc_timestamp = rtc_read(); // verify it's been successfully updated
     LogInfo("RTC reports %s", ctime(&rtc_timestamp));
 
-    LogInfo("Starting the Demo");
-    demo();
-    LogInfo("The demo has ended");
+    uint8_t id;
+    float value1, value2;
+    
+    oled.clear();
+    oled.printf( "Azure Cloud Demo\n" );
+    
+    /* Init all sensors with default params */
+    hum_temp.init(NULL);
+    hum_temp.enable();
+    
+    hum_temp.read_id(&id);
+    printf("HTS221  humidity & temperature    = 0x%X\r\n", id);  
+
+    servo2 = 0.5f;  
+
+    LogInfo("Starting the Loop");
+    loop();
+    LogInfo("The Loop has ended");
 
     while (true) {
         sleep();

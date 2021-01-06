@@ -36,3 +36,7 @@ mbed-os
 mbed-client-for-azure
 ntp-client
 iotkit
+HTS221
+bmp180
+
+mbed_app.json-with-connection-string

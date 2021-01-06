@@ -12,6 +12,7 @@
     "target_overrides": {
         "*": {
             "platform.stdio-convert-newlines": true,
+            "target.printf_lib": "std",
             "platform.stdio-baud-rate": 9600,
             "nsapi.default-wifi-security": "WPA_WPA2",
             "nsapi.default-wifi-ssid": "\"LERNKUBE\"",
