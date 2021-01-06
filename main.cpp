@@ -50,7 +50,7 @@ Servo servo2 ( MBED_CONF_IOTKIT_SERVO2 );
 // Global symbol referenced by the Azure SDK's port for Mbed OS, via "extern"
 NetworkInterface *_defaultSystemNetwork;
 
-static bool message_received = false;
+static bool exit_message_received = false;
 
 static void on_connection_status(IOTHUB_CLIENT_CONNECTION_STATUS result, IOTHUB_CLIENT_CONNECTION_STATUS_REASON reason, void* user_context)
 {
@@ -72,8 +72,13 @@ static IOTHUBMESSAGE_DISPOSITION_RESULT on_message_received(IOTHUB_MESSAGE_HANDL
         return IOTHUBMESSAGE_ABANDONED;
     }
 
-    message_received = true;
     LogInfo("Message body: %.*s", len, data_ptr);
+
+    // exit Message beendet loop()
+    if ( strncmp( (char*) data_ptr, "exit", len) == 0 ) 
+    {
+      exit_message_received = true;
+    }
 
     float value;
     if  ( sscanf( (char*) data_ptr, "servo2=%f", &value ) == 1 )
@@ -104,61 +109,59 @@ void loop()
     LogInfo("Initializing IoT Hub client");
     IoTHub_Init();
 
-    IOTHUB_DEVICE_CLIENT_HANDLE client_handle = IoTHubDeviceClient_CreateFromConnectionString(
-        connection_string,
-        MQTT_Protocol
-    );
+    IOTHUB_DEVICE_CLIENT_HANDLE client_handle = IoTHubDeviceClient_CreateFromConnectionString( connection_string, MQTT_Protocol );
     if (client_handle == nullptr) {
         LogError("Failed to create IoT Hub client handle");
-        goto cleanup;
+        return;
     }
 
     // Enable SDK tracing
     res = IoTHubDeviceClient_SetOption(client_handle, OPTION_LOG_TRACE, &trace_on);
     if (res != IOTHUB_CLIENT_OK) {
         LogError("Failed to enable IoT Hub client tracing, error: %d", res);
-        goto cleanup;
+        return;
     }
 
     // Enable static CA Certificates defined in the SDK
     res = IoTHubDeviceClient_SetOption(client_handle, OPTION_TRUSTED_CERT, certificates);
     if (res != IOTHUB_CLIENT_OK) {
         LogError("Failed to set trusted certificates, error: %d", res);
-        goto cleanup;
+        return;
     }
 
     // Process communication every 100ms
     res = IoTHubDeviceClient_SetOption(client_handle, OPTION_DO_WORK_FREQUENCY_IN_MS, &interval);
     if (res != IOTHUB_CLIENT_OK) {
         LogError("Failed to set communication process frequency, error: %d", res);
-        goto cleanup;
+        return;
     }
 
     // set incoming message callback
     res = IoTHubDeviceClient_SetMessageCallback(client_handle, on_message_received, nullptr);
     if (res != IOTHUB_CLIENT_OK) {
         LogError("Failed to set message callback, error: %d", res);
-        goto cleanup;
+        return;
     }
 
     // Set connection/disconnection callback
     res = IoTHubDeviceClient_SetConnectionStatusCallback(client_handle, on_connection_status, nullptr);
     if (res != IOTHUB_CLIENT_OK) {
         LogError("Failed to set connection status callback, error: %d", res);
-        goto cleanup;
+        return;
     }
 
     // Send ten message to the cloud (one per second)
     // or until we receive a message from the cloud
     IOTHUB_MESSAGE_HANDLE message_handle;
     char message[80];
-    for (int i = 0; i < 10; ++i) 
+    int i = 0;
+    while ( true )
     {
-        if (message_received) 
-        {
-            // If we have received a message from the cloud, don't send more messages
-            break;
-        }
+      if (exit_message_received) {
+        // If we have received a exit message from the cloud, don't send more
+        // messages
+        break;
+      }
 
         // Temperator Sensor lesen und als PayLoad aufbereiten
         hum_temp.read_id(&id);
@@ -170,8 +173,15 @@ void loop()
         message_handle = IoTHubMessage_CreateFromString(message);
         if (message_handle == nullptr) {
             LogError("Failed to create message");
-            goto cleanup;
+            return;
         }
+
+        oled.cursor( 1, 0 );
+        oled.printf( "id  : %d\n", i++ );
+        oled.cursor( 2, 0 );    
+        oled.printf( "temp: %2.2f\n", temp );        
+        oled.cursor( 3, 0 );    
+        oled.printf( "hum : %2.2f\n", hum );        
 
         const char* MSG_ID = "iotkit";
         const char* MSG_CORRELATION_ID = "sensors";
@@ -194,21 +204,12 @@ void loop()
 
         if (res != IOTHUB_CLIENT_OK) {
             LogError("Failed to send message event, error: %d", res);
-            goto cleanup;
+            break;
         }
 
-        ThisThread::sleep_for(1s);
+        ThisThread::sleep_for(5s);
     }
 
-    // If the user didn't manage to send a cloud-to-device message earlier,
-    // let's wait until we receive one
-    while (!message_received) {
-        // Continue to receive messages in the communication thread
-        // which is internally created and maintained by the Azure SDK.
-        sleep();
-    }
-
-cleanup:
     IoTHubDeviceClient_Destroy(client_handle);
     IoTHub_Deinit();
 }
