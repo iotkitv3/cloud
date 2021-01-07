@@ -206,8 +206,8 @@ void loop()
             LogError("Failed to send message event, error: %d", res);
             break;
         }
-
-        ThisThread::sleep_for(5s);
+        // Um "Daily messages quota" nicht zu ueberschreiten
+        ThisThread::sleep_for(15s);
     }
 
     IoTHubDeviceClient_Destroy(client_handle);
