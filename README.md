@@ -38,7 +38,46 @@ Befolgen Sie die offizielle Dokumentation von Azure IoT Hub zu
 
 Jetzt kann der IoT Hub mit diesem [Beispiel](main.cpp) verwendet werden.
 
-Das [mbed Beispiel](main.cpp) verbindet sich via dem MQTT Protokoll mit der Azure Cloud.
+Das [mbed Beispiel](main.cpp) verbindet sich via dem MQTT Protokoll mit der Azure Cloud. 
+
+Dabei werden die Felder `correlation_id`, `message_id` und `payload` übertragen. Im Feld `payload` steht eine fortlaufende Id, die Id des Temperatursensors und Temperatur und Luftfeuchtigkeit (bei BPM180 Sensor: Luftdruck).
+
+Die Events sehen in etwa so aus:
+
+    {
+        "event": {
+            "origin": "K64F",
+            "module": "",
+            "interface": "",
+            "component": "",
+            "properties": {
+                "system": {
+                    "correlation_id": "sensors",
+                    "message_id": "iotkit"
+                },
+                "application": {}
+            },
+            "annotations": {
+                "iothub-connection-device-id": "K64F",
+                "iothub-connection-auth-method": "{\"scope\":\"device\",\"type\":\"sas\",\"issuer\":\"iothub\",\"acceptingIpFilterRule\":null}",
+                "iothub-connection-auth-generation-id": "637446820856720308",
+                "iothub-enqueuedtime": 1610009322243,
+                "iothub-message-source": "Telemetry",
+                "x-opt-sequence-number": 985,
+                "x-opt-offset": "4295386552",
+                "x-opt-enqueued-time": 1610009322243
+            },
+            "payload": "{ \"message\": 72, \"sensorid\": 0xBC, \"temp\": 23.40, \"hum\": 36.9 }"
+        }
+    }
+
+Neben dem Senden von Daten, kann das Board auch Meldungen empfangen. Dazu ist im IoT Hub zuerst die IoT Device, hier K64F, anzuwählen und dann der Tab `Message to device`. Dort können Daten an das Board gesendet werden. Im Moment wir die Ansteuerung eines Servos unterstützt.
+
+Beispiel:
+
+    servo2=0.2
+        
+Setzt den Servo 2 auf die Position 0.2.
 
 **Anzeigen der Meldungen**
 
