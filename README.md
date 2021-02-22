@@ -94,6 +94,59 @@ Anschliessend sich einloggen, `azure-iot` Extension installieren und Events ausg
 * [Azure C SDK](https://github.com/Azure/azure-iot-sdk-c)
 * [How to test Messages arriving in Azure IoTHub](https://stackoverflow.com/questions/35381303/how-to-test-messages-arriving-in-azure-iothub)
 
+### Azure PowerBi Pipeline
+
+![](images/azure-pipeline.png)
+
+- - - 
+
+Azure stellt mit PowerBi einen Möglichkeit zur Verfügung die Sensordaten weiterzuverarbeiten.
+
+Dazu sind einige Schritte nötig.
+
+![](images/azure-hub.png)
+
+Zuerst ist ein IoT Hub in der Azure Cloud zu erstellen:
+
+![](images/azure-iotdevice.png)
+
+Und in diesem eine IoT Device
+
+![](images/azure-key.png)
+
+Damit sich das IoTKitV3 mit der Azure Cloud verbinden kann, brauchen wir den "Primary Connection String". Dieser ist in die Datei `mbed_app.json` zur übertragen.
+Anschliessend ist das Programm zu compilieren und z.B. wie oben beschrieben, zu testen.
+
+![](images/azure-connect.png)
+
+#### Auswerten der Daten 
+
+Um die Daten in der Azure Cloud auszuwerten, braucht es einen Stream Analytics Job welcher die Daten sammelt und an PowerPi weiterreicht.
+
+![](images/13.PNG) 
+
+Consumer Gruppe zu IoT hub hinzufügen
+
+![](images/14.PNG)  
+
+Stream Analytics Job erstellen
+
+![](images/15.PNG)  
+![](images/16.PNG) 
+
+Input und Output zum Stream Analytics Job hinzufügen und Verlinkung mit IoT Hub
+
+![](images/17.PNG)  
+
+Query anpassen, damit er mit dem Stream Analytics Jobs übereinstimmt. Starten des Jobs, welche die Daten sammelt und an PowerPi weiterreicht.
+
+![](images/18.PNG)  
+
+Zum Schluss sind die anzuzeigenden Daten in PowerPi zu erfassen und der Report zu erstellen (gelbe Markierung beachten).
+
+![](images/19.PNG)  
+
+Das Ergebnis sieht dann wie oben aus.
 
 ## AWS IoT
 ***
